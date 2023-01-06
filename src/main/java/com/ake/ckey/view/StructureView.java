@@ -118,7 +118,8 @@ public class StructureView {
         if (null != model.getHorizontalBits()  && !model.getHorizontalBits().isBlank()) {
             String[] horizontalBitArray = model.getHorizontalBits().split("");
             for (int i = 0; i < horizontalBitArray.length; i++) {
-                if ("1".equals(horizontalBitArray[i]) && i < horizontalShortLineList.size()) {
+                if (i == horizontalShortLineList.size()) break;
+                if ("1".equals(horizontalBitArray[i])) {
                     this.structPane.getChildren().add(horizontalShortLineList.get(i));
                 }
             }
@@ -126,7 +127,8 @@ public class StructureView {
         if (null != model.getVerticalBits() && !model.getVerticalBits().isBlank()) {
             String[] verticalBitArray = model.getVerticalBits().split("");
             for (int i = 0; i < verticalBitArray.length; i++) {
-                if ("1".equals(verticalBitArray[i]) && i < verticalShortLineList.size()) {
+                if (i == verticalShortLineList.size()) break;
+                if ("1".equals(verticalBitArray[i])) {
                     this.structPane.getChildren().add(verticalShortLineList.get(i));
                 }
             }
