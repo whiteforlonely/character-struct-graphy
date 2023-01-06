@@ -63,8 +63,7 @@ public class ParamControlView {
 
         paramViews.get(1).setListener( text -> {
             System.out.println("vertical bits changed: " + text);
-            if (text.isBlank()) return;
-            if (!text.matches("[0-1]+")) {
+            if (!text.isBlank() && !text.matches("[0-1]+")) {
                 // TODO need to tip
                 return;
             }
@@ -76,8 +75,7 @@ public class ParamControlView {
 
         paramViews.get(2).setListener( text -> {
             System.out.println("horizontal bits changed: " + text);
-            if (text.isBlank()) return;
-            if (!text.matches("[0-1]+")) {
+            if (! text.isBlank() && !text.matches("[0-1]+")) {
                 // TODO need to tip
                 return;
             }

@@ -31,7 +31,7 @@ public class StructGraphicModel {
     private double lineSegmentWidth = 2;
 
     /** 小线段的颜色 */
-    private Color lineSegmentColor = Color.GRAY;
+    private Color lineSegmentColor = Color.ALICEBLUE;
 
     /** 结构图背景色 */
     private Color backgroundColor = Color.BLACK;

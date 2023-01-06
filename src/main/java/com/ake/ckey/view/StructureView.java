@@ -7,6 +7,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 有变化结构的地方
  */
@@ -62,15 +65,30 @@ public class StructureView {
 
         this.structPane.getChildren().add(rectangle);
 
+        List<Line> verticalShortLineList = new ArrayList<>();
+        List<Line> horizontalShortLineList = new ArrayList<>();
+
         // 画网格线
         // 1. 横的网格线
         double lineStartY = starty;
         for (int i = 0; i < model.getRows() - 1; i++) {
             lineStartY += model.getCellWidth();
             Line line = new Line(startx, lineStartY, startx + structWidth, lineStartY);
-            line.setStroke(Color.ALICEBLUE);
+            line.setStroke(Color.rgb(255,255,255,.2));
             line.setStrokeWidth(model.getLineSegmentWidth());
             this.structPane.getChildren().add(line);
+
+            // 初始化对应的短线段
+            double shortLineStartX = startx;
+            for (int j = 0; j < model.getRows(); j++) {
+                Line shortLine = new Line(shortLineStartX - model.getLineSegmentWidth(), lineStartY, shortLineStartX + model.getCellWidth(), lineStartY);
+                shortLine.setStrokeWidth(model.getLineSegmentWidth());
+                shortLine.setStroke(model.getLineSegmentColor());
+                horizontalShortLineList.add(shortLine);
+                shortLineStartX += model.getCellWidth();
+                shortLineStartX += model.getLineSegmentWidth();
+            }
+
             lineStartY += model.getLineSegmentWidth();
         }
         // 2. 竖的网格线
@@ -78,10 +96,40 @@ public class StructureView {
         for (int i = 0; i < model.getRows() - 1; i ++) {
             lineStartX += model.getCellWidth();
             Line line = new Line(lineStartX, starty, lineStartX, starty + structWidth);
-            line.setStroke(Color.ALICEBLUE);
+            line.setStroke(Color.rgb(255,255,255,.2));
             line.setStrokeWidth(model.getLineSegmentWidth());
             this.structPane.getChildren().add(line);
+
+            // 初始化对应的短线段
+            double shortLineStartY = starty;
+            for (int j = 0; j < model.getRows(); j++) {
+                Line shortLine = new Line(lineStartX, shortLineStartY, lineStartX, shortLineStartY + model.getCellWidth());
+                shortLine.setStrokeWidth(model.getLineSegmentWidth());
+                shortLine.setStroke(model.getLineSegmentColor());
+                verticalShortLineList.add(shortLine);
+                shortLineStartY += model.getCellWidth();
+                shortLineStartY += model.getLineSegmentWidth();
+            }
+
             lineStartX += model.getLineSegmentWidth();
+        }
+
+        // 3. 开始画对应的短线
+        if (null != model.getHorizontalBits()  && !model.getHorizontalBits().isBlank()) {
+            String[] horizontalBitArray = model.getHorizontalBits().split("");
+            for (int i = 0; i < horizontalBitArray.length; i++) {
+                if ("1".equals(horizontalBitArray[i]) && i < horizontalShortLineList.size()) {
+                    this.structPane.getChildren().add(horizontalShortLineList.get(i));
+                }
+            }
+        }
+        if (null != model.getVerticalBits() && !model.getVerticalBits().isBlank()) {
+            String[] verticalBitArray = model.getVerticalBits().split("");
+            for (int i = 0; i < verticalBitArray.length; i++) {
+                if ("1".equals(verticalBitArray[i]) && i < verticalShortLineList.size()) {
+                    this.structPane.getChildren().add(verticalShortLineList.get(i));
+                }
+            }
         }
     }
 
