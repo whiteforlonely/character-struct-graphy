@@ -27,8 +27,8 @@ public class ParamControlView {
     public ParamControlView(){
         paramViews = new ArrayList<>();
         paramViews.add(initParam(TextField.class, "宫格数") );
-        paramViews.add(initParam(TextField.class, "竖线段标识（二进制文本 1101）") );
-        paramViews.add(initParam(TextField.class, "横线段标识（二进制文本 1101）") );
+        paramViews.add(initParam(TextField.class, "竖线段(1101)") );
+        paramViews.add(initParam(TextField.class, "横线段(1101)") );
 
         dataModel = new StructGraphicModel();
         initParamValue();

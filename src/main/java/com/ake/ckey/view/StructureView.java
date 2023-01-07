@@ -2,13 +2,19 @@ package com.ake.ckey.view;
 
 import com.ake.ckey.controller.AlertController;
 import com.ake.ckey.model.StructGraphicModel;
-import javafx.scene.layout.Pane;
+import javafx.geometry.Orientation;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 有变化结构的地方
@@ -17,14 +23,28 @@ public class StructureView {
 
     /** 结构画板 */
     private Pane structPane;
+    private StructGraphicModel snapshot;
 
     public StructureView(){
         this.structPane = new Pane();
-        this.structPane.setMinHeight(1000);
-        this.structPane.setMinWidth(1000);
+        this.structPane.setMinHeight(500);
+        this.structPane.setMinWidth(500);
+
+        this.structPane.widthProperty().addListener((obs, oldVal, newVal) -> refreshLayout());
+        this.structPane.heightProperty().addListener((obs, oldVal, newVal) -> refreshLayout());
+    }
+
+    public void refreshLayout(){
+        this.updateView(this.snapshot);
     }
 
     public void updateView(StructGraphicModel model){
+        this.snapshot = model;
+        if (model == null) return;
+
+        this.structPane.setBorder(new Border(
+                new BorderStroke(Color.GREEN, BorderStrokeStyle.SOLID,
+                        new CornerRadii(2), BorderStroke.THICK)));
         this.structPane.getChildren().clear();
 
         double width = structPane.getWidth();
@@ -132,6 +152,94 @@ public class StructureView {
                     this.structPane.getChildren().add(verticalShortLineList.get(i));
                 }
             }
+        }
+
+        // 4. 添加label提示对应的编码，十六进制
+        FlowPane hBox = new FlowPane(Orientation.HORIZONTAL);
+        hBox.setMaxWidth(500);
+        String regularVerticalBits = getRegularCode(model.getRows(), model.getVerticalBits());
+        String regularHorizontalBits = getRegularCode(model.getRows(), model.getHorizontalBits());
+        Label label = new Label();
+        label.setText("最终编码为: ");
+        hBox.getChildren().add(label);
+
+        Label labelVerticalBits = new Label();
+        labelVerticalBits.setText(regularVerticalBits);
+        labelVerticalBits.setBackground(Background.fill(Color.GREEN));
+        hBox.getChildren().add(labelVerticalBits);
+
+        Label labelHorizontalBits = new Label();
+        labelHorizontalBits.setBackground(Background.fill(Color.RED));
+        labelHorizontalBits.setText(regularHorizontalBits);
+        hBox.getChildren().add(labelHorizontalBits);
+
+        String finalBits = regularVerticalBits + regularHorizontalBits;
+
+        BigInteger resultNumber = finalBits.isBlank() ? BigInteger.ZERO : new BigInteger(finalBits, 2);
+        Label label1 = new Label();
+        label1.setText("最终表示的整数为： " + resultNumber);
+        label1.setBackground(Background.fill(Color.YELLOWGREEN));
+        label1.setMinWidth(400);
+        hBox.getChildren().add(label1);
+
+        TextField label2 = new TextField();
+        label2.setText("对应的十六进制编码为 0x" + bin2hex(finalBits));
+        label2.setBackground(Background.fill(Color.BISQUE));
+        label2.setEditable(false);
+        label2.setPrefWidth(450);
+        hBox.getChildren().add(label2);
+
+        hBox.setLayoutX(10);
+        hBox.setLayoutY(10);
+
+        this.structPane.getChildren().add(hBox);
+    }
+
+    private String bin2hex(String input) {
+        if (input.isBlank()) return "";
+        StringBuilder sb = new StringBuilder();
+        int len = input.length();
+        if (input.length()%8 != 0) {
+            // 需要前面补0
+            int leftBits = 8 - input.length()%8;
+            List<String> bitList = Arrays.stream(input.split("")).collect(Collectors.toList());
+            for (int i = 0; i < leftBits; i++) {
+                bitList.add(0, "0");
+            }
+            input = String.join("", bitList);
+            len = input.length();
+        }
+
+        for (int i = 0; i < len / 4; i++){
+            //每4个二进制位转换为1个十六进制位
+            String temp = input.substring(i * 4, (i + 1) * 4);
+            int tempInt = Integer.parseInt(temp, 2);
+            String tempHex = Integer.toHexString(tempInt).toUpperCase();
+            sb.append(tempHex);
+        }
+
+        return sb.toString();
+    }
+
+    private String getRegularCode(int rows, String bits){
+        if (rows < 2) {
+            return "";
+        }
+        if (bits == null) {
+            bits = "";
+        }
+        bits = bits.trim();
+        int maxBitSize = rows * (rows - 1);
+        if (bits.length() > maxBitSize) {
+            return bits.substring(0, maxBitSize);
+        } else {
+            // 这边需要后边补0
+            int leftBits = maxBitSize - bits.length();
+            StringBuilder tmpResult = new StringBuilder(bits);
+            for (int i = 0; i < leftBits; i++) {
+                tmpResult.append('0');
+            }
+            return tmpResult.toString();
         }
     }
 

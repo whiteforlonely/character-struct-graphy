@@ -23,9 +23,7 @@ public class MainController {
             vBox.getChildren().add(paramView.getRoot());
         }
         HBox window = new HBox(vBox, structureView.getStructPane());
-        structureView.getStructPane().setBorder(new Border(
-                new BorderStroke(Color.GREEN, BorderStrokeStyle.SOLID,
-                        new CornerRadii(2), BorderStroke.THICK)));
+        HBox.setHgrow(structureView.getStructPane(), Priority.ALWAYS);
 
         paramControlView.setListener(dataModel -> this.structureView.updateView(dataModel));
 

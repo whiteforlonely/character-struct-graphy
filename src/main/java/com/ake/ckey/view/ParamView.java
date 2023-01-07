@@ -5,6 +5,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.TextAlignment;
 
 /**
  * 参数行
@@ -22,9 +23,10 @@ public class ParamView<C extends Control> {
         this.component = component;
 
         Label label = new Label(labelName);
-        label.setMinWidth(200);
+        label.setMinWidth(80);
+        label.setTextAlignment(TextAlignment.LEFT);
         finalView = new HBox(label, component);
-        this.finalView.setPadding(new Insets(20));
+        this.finalView.setPadding(new Insets(5));
 
         if (this.component instanceof TextField) {
             TextField textField = (TextField) this.component;
