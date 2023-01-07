@@ -221,6 +221,17 @@ public class StructureView {
         return sb.toString();
     }
 
+    /**
+     * 针对于输入框中的二进制文本，转换成规范的二进制文本，
+     * 二进制的位数是跟对应的宫格数有关系的，计算公式为：
+     * bitLength(二进制长度) = rows(宫格数) * (rows - 1)
+     *
+     * 如果输入的产出规定的长度，就直接截取，如果少于规定长度，就直接尾部补0
+     *
+     * @param rows 宫格数
+     * @param bits 原始文本框输入的数据
+     * @return 规范的二进制数
+     */
     private String getRegularCode(int rows, String bits){
         if (rows < 2) {
             return "";
@@ -235,11 +246,7 @@ public class StructureView {
         } else {
             // 这边需要后边补0
             int leftBits = maxBitSize - bits.length();
-            StringBuilder tmpResult = new StringBuilder(bits);
-            for (int i = 0; i < leftBits; i++) {
-                tmpResult.append('0');
-            }
-            return tmpResult.toString();
+            return bits + "0".repeat(leftBits);
         }
     }
 
