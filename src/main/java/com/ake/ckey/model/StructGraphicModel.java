@@ -10,14 +10,6 @@ public class StructGraphicModel {
     /** 宫格数量 */
     private int rows = 5;
 
-    /**
-     * 结构编码
-     * （对应二进制数文本，由竖线段和横线短拼接，
-     * 竖线高位，横线低位，统一通过此转换成对应
-     * 的数字或者其他形式的编码）
-     * */
-    private String structCode;
-
     /** 竖线段的显示标志 */
     private String verticalBits;
 
@@ -33,11 +25,44 @@ public class StructGraphicModel {
     /** 小线段的颜色 */
     private Color lineSegmentColor = Color.ALICEBLUE;
 
+    /** 线段背景色 */
+    private Color lineBackground = Color.WHITESMOKE;
+
     /** 结构图背景色 */
     private Color backgroundColor = Color.BLACK;
 
     /** 是否有边框 */
     private boolean hasBorder = true;
+
+    /** 边框宽度 */
+    private double borderWidth = 3;
+
+    /** 边框颜色 */
+    private Color borderColor = Color.GREENYELLOW;
+
+    public Color getLineBackground() {
+        return lineBackground;
+    }
+
+    public void setLineBackground(Color lineBackground) {
+        this.lineBackground = lineBackground;
+    }
+
+    public double getBorderWidth() {
+        return borderWidth;
+    }
+
+    public void setBorderWidth(double borderWidth) {
+        this.borderWidth = borderWidth;
+    }
+
+    public Color getBorderColor() {
+        return borderColor;
+    }
+
+    public void setBorderColor(Color borderColor) {
+        this.borderColor = borderColor;
+    }
 
     public Color getLineSegmentColor() {
         return lineSegmentColor;
@@ -53,14 +78,6 @@ public class StructGraphicModel {
 
     public void setRows(int rows) {
         this.rows = rows;
-    }
-
-    public String getStructCode() {
-        return structCode;
-    }
-
-    public void setStructCode(String structCode) {
-        this.structCode = structCode;
     }
 
     public String getVerticalBits() {
@@ -111,19 +128,5 @@ public class StructGraphicModel {
         this.hasBorder = hasBorder;
     }
 
-    @Override
-    public String toString() {
-        return "StructGraphicModel{" +
-                "rows=" + rows +
-                ", structCode='" + structCode + '\'' +
-                ", verticalBits='" + verticalBits + '\'' +
-                ", horizontalBits='" + horizontalBits + '\'' +
-                ", cellWidth=" + cellWidth +
-                ", lineSegmentWidth=" + lineSegmentWidth +
-                ", lineSegmentColor=" + lineSegmentColor +
-                ", backgroundColor=" + backgroundColor +
-                ", hasBorder=" + hasBorder +
-                '}';
-    }
 }
 
