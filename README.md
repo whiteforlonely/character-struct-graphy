@@ -41,3 +41,8 @@
 是否有边框 | bool | 只能是输入字符串true或者false, true标识要绘制边框，false标识不绘制结构图边框。
 边框宽度 | double | 结构图的边框的厚度，取值范围 1-10
 边框颜色 | color | 结构图的边框的颜色，输入格式同线段颜色
+
+## 参考资料
+
+1. [如何新建JavaFX项目并打成可运行 Jar包](https://www.cnblogs.com/alpha-cat/p/16261453.html)
+2. [javaFX官网](https://openjfx.io/)
