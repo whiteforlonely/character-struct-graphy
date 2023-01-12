@@ -32,6 +32,8 @@ public class ParamControlView {
     private StructGraphicModel dataModel;
     private ParamChangeListener listener;
 
+    private final String colorRegex = "([0-9]{1,3}\\s){2}[0-9]{1,3}(\\s(0|1)?\\.?[0-9]+)?";
+
     public ParamControlView(){
         paramViews = new ArrayList<>();
         paramViews.add(initParam(TextField.class, "宫格数") );
@@ -70,13 +72,12 @@ public class ParamControlView {
         // 监听rows变更
         paramViews.get(0).setListener( text -> {
             System.out.println("rows changed: " + text);
+            text = text.trim();
             if (text.isBlank() || !text.matches("\\d+")) {
-                // TODO need to tip
                 return;
             }
             int rows = Integer.parseInt(text);
             if (rows < 2 || rows > 100) {
-                // TODO need to tip
                 return;
             }
             this.dataModel.setRows(rows);
@@ -88,7 +89,6 @@ public class ParamControlView {
         paramViews.get(1).setListener( text -> {
             System.out.println("vertical bits changed: " + text);
             if (!text.isBlank() && !text.matches("[0-1]+")) {
-                // TODO need to tip
                 return;
             }
             this.dataModel.setVerticalBits(text);
@@ -99,11 +99,131 @@ public class ParamControlView {
 
         paramViews.get(2).setListener( text -> {
             System.out.println("horizontal bits changed: " + text);
-            if (! text.isBlank() && !text.matches("[0-1]+")) {
-                // TODO need to tip
+            text = text.trim();
+            if (!text.isBlank() && !text.matches("[0-1]+")) {
                 return;
             }
             this.dataModel.setHorizontalBits(text);
+            if (null != listener) {
+                listener.handleModel(this.dataModel);
+            }
+        });
+
+        paramViews.get(3).setListener( text -> {
+            System.out.println("cell width changed: " + text);
+            text = text.trim();
+            if (text.isBlank() || !text.isBlank() && !text.matches("[0-9]+[.]?[0-9]*")) {
+                return;
+            }
+            double width = Double.parseDouble(text);
+            if (width > 100) {
+                width = 100;
+            } else if (width < 20) {
+                width = 20;
+            }
+            this.dataModel.setCellWidth(width);
+            if (null != listener) {
+                listener.handleModel(this.dataModel);
+            }
+        });
+
+        paramViews.get(4).setListener( text -> {
+            System.out.println("line segment width changed: " + text);
+            text = text.trim();
+            if (text.isBlank() || !text.isBlank() && !text.matches("[0-9]+[.]?[0-9]*")) {
+                return;
+            }
+            double lineSegmentWidth = Double.parseDouble(text);
+            if (lineSegmentWidth > 10) {
+                lineSegmentWidth = 10;
+            } if (lineSegmentWidth < 1) {
+                lineSegmentWidth = 1;
+            }
+            this.dataModel.setLineSegmentWidth(lineSegmentWidth);
+            if (null != listener) {
+                listener.handleModel(this.dataModel);
+            }
+        });
+
+        paramViews.get(5).setListener( text -> {
+            System.out.println("line segment color changed: " + text);
+            text = text.trim();
+            if (!text.matches(colorRegex)) {
+                return;
+            }
+            Color color = parseFromText(text);
+            this.dataModel.setLineSegmentColor(color);
+            if (null != listener) {
+                listener.handleModel(this.dataModel);
+            }
+        });
+
+        paramViews.get(6).setListener( text -> {
+            System.out.println("line background color changed: " + text);
+            text = text.trim();
+            if (!text.matches(colorRegex)) {
+                return;
+            }
+            Color color = parseFromText(text);
+            this.dataModel.setLineBackground(color);
+            if (null != listener) {
+                listener.handleModel(this.dataModel);
+            }
+        });
+
+
+        paramViews.get(7).setListener( text -> {
+            System.out.println("background color changed: " + text);
+            text = text.trim();
+            if (!text.matches(colorRegex)) {
+                return;
+            }
+            Color color = parseFromText(text);
+            this.dataModel.setBackgroundColor(color);
+            if (null != listener) {
+                listener.handleModel(this.dataModel);
+            }
+        });
+
+        paramViews.get(8).setListener( text -> {
+            System.out.println("enable border changed: " + text);
+            text = text.trim();
+            if (!text.matches("(true|false)")) {
+                return;
+            }
+            boolean hasBorder = Boolean.parseBoolean(text);
+            this.dataModel.setHasBorder(hasBorder);
+            if (null != listener) {
+                listener.handleModel(this.dataModel);
+            }
+        });
+
+        paramViews.get(9).setListener( text -> {
+            System.out.println("border width changed: " + text);
+            text = text.trim();
+            if (text.isBlank() || !text.isBlank() && !text.matches("[0-9]+[.]?[0-9]*")) {
+                return;
+            }
+            double borderWidth = Double.parseDouble(text);
+            if (borderWidth > 20) {
+                borderWidth = 20;
+            } if (borderWidth < 2) {
+                borderWidth = 2;
+            }
+            this.dataModel.setBorderWidth(borderWidth);
+            if (null != listener) {
+                listener.handleModel(this.dataModel);
+            }
+        });
+
+        paramViews.get(10).setListener( text -> {
+            System.out.println("border color changed: " + text);
+            text = text.trim();
+            if (!text.matches(colorRegex)) {
+                return;
+            }
+            Color color = parseFromText(text);
+            this.dataModel.setBorderColor(color);
             if (null != listener) {
                 listener.handleModel(this.dataModel);
             }
@@ -242,14 +362,14 @@ public class ParamControlView {
 
     private Color parseFromText(String text){
         text = text.trim();
-        if (!text.matches("([0-9]{1,3}\\s){2}[0-9]{1,3}(\\s0?\\.[0-9]+)?")) {
+        if (!text.matches(colorRegex)) {
             return null;
         }
 
         String[] rgbc = text.split("\\s");
-        int r = Integer.parseInt(rgbc[0])%255;
-        int g = Integer.parseInt(rgbc[1])%255;
-        int b = Integer.parseInt(rgbc[2])%255;
+        int r = Integer.parseInt(rgbc[0])%256;
+        int g = Integer.parseInt(rgbc[1])%256;
+        int b = Integer.parseInt(rgbc[2])%256;
         if (rgbc.length == 4) {
             double opacity = Double.parseDouble(rgbc[3]);
             return Color.rgb(r, g, b, opacity);

@@ -2,6 +2,7 @@ package com.ake.ckey.view;
 
 import com.ake.ckey.controller.AlertController;
 import com.ake.ckey.model.StructGraphicModel;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -66,11 +67,12 @@ public class StructureView {
 
         if (model.isHasBorder()) {
             // 画边框
-            double borderStartX = startx - 2;
-            double borderStartY = starty - 2;
+            double borderStartX = startx - model.getBorderWidth();
+            double borderStartY = starty - model.getBorderWidth();
 
-            Rectangle borderRect = new Rectangle(borderStartX, borderStartY, structWidth + 4, structWidth + 4);
-            borderRect.setStroke(Color.YELLOWGREEN);
+            Rectangle borderRect = new Rectangle(borderStartX, borderStartY, structWidth + 2*model.getBorderWidth(), structWidth + 2*model.getBorderWidth());
+            borderRect.setFill(model.getBorderColor());
+            borderRect.setStroke(model.getBorderColor());
             borderRect.setArcWidth(5);
             borderRect.setArcHeight(5);
 
@@ -79,6 +81,7 @@ public class StructureView {
 
         // 画矩形
         Rectangle rectangle = new Rectangle(startx, starty, structWidth, structWidth);
+        rectangle.setFill(model.getBackgroundColor());
         rectangle.setStroke(model.getBackgroundColor());
         rectangle.setArcWidth(5);
         rectangle.setArcHeight(5);
@@ -94,14 +97,19 @@ public class StructureView {
         for (int i = 0; i < model.getRows() - 1; i++) {
             lineStartY += model.getCellWidth();
             Line line = new Line(startx, lineStartY, startx + structWidth, lineStartY);
-            line.setStroke(Color.rgb(255,255,255,.2));
+            line.setStroke(model.getLineBackground());
             line.setStrokeWidth(model.getLineSegmentWidth());
             this.structPane.getChildren().add(line);
 
             // 初始化对应的短线段
             double shortLineStartX = startx;
             for (int j = 0; j < model.getRows(); j++) {
-                Line shortLine = new Line(shortLineStartX - model.getLineSegmentWidth(), lineStartY, shortLineStartX + model.getCellWidth(), lineStartY);
+                double sx = shortLineStartX;
+                if (j > 0) {
+                    // 非起始位置，需要做偏移
+                    sx = shortLineStartX - model.getLineSegmentWidth();
+                }
+                Line shortLine = new Line(sx, lineStartY, shortLineStartX + model.getCellWidth(), lineStartY);
                 shortLine.setStrokeWidth(model.getLineSegmentWidth());
                 shortLine.setStroke(model.getLineSegmentColor());
                 horizontalShortLineList.add(shortLine);
@@ -116,7 +124,7 @@ public class StructureView {
         for (int i = 0; i < model.getRows() - 1; i ++) {
             lineStartX += model.getCellWidth();
             Line line = new Line(lineStartX, starty, lineStartX, starty + structWidth);
-            line.setStroke(Color.rgb(255,255,255,.2));
+            line.setStroke(model.getLineBackground());
             line.setStrokeWidth(model.getLineSegmentWidth());
             this.structPane.getChildren().add(line);
 
@@ -134,65 +142,92 @@ public class StructureView {
             lineStartX += model.getLineSegmentWidth();
         }
 
-        // 3. 开始画对应的短线
-        if (null != model.getHorizontalBits()  && !model.getHorizontalBits().isBlank()) {
-            String[] horizontalBitArray = model.getHorizontalBits().split("");
-            for (int i = 0; i < horizontalBitArray.length; i++) {
-                if (i == horizontalShortLineList.size()) break;
-                if ("1".equals(horizontalBitArray[i])) {
-                    this.structPane.getChildren().add(horizontalShortLineList.get(i));
-                }
-            }
-        }
-        if (null != model.getVerticalBits() && !model.getVerticalBits().isBlank()) {
-            String[] verticalBitArray = model.getVerticalBits().split("");
-            for (int i = 0; i < verticalBitArray.length; i++) {
-                if (i == verticalShortLineList.size()) break;
-                if ("1".equals(verticalBitArray[i])) {
-                    this.structPane.getChildren().add(verticalShortLineList.get(i));
-                }
-            }
-        }
-
-        // 4. 添加label提示对应的编码，十六进制
+        // 5. 添加label提示对应的编码，十六进制
         FlowPane hBox = new FlowPane(Orientation.HORIZONTAL);
-        hBox.setMaxWidth(500);
+        hBox.setMinWidth(450);
         String regularVerticalBits = getRegularCode(model.getRows(), model.getVerticalBits());
         String regularHorizontalBits = getRegularCode(model.getRows(), model.getHorizontalBits());
         Label label = new Label();
-        label.setText("最终编码为: ");
+        label.setText("最终编码V：");
+        label.setPadding(new Insets(0, 0, 0, 10));
         hBox.getChildren().add(label);
 
-        Label labelVerticalBits = new Label();
+        TextField labelVerticalBits = new TextField();
         labelVerticalBits.setText(regularVerticalBits);
         labelVerticalBits.setBackground(Background.fill(Color.GREEN));
+        labelVerticalBits.setEditable(false);
+        labelVerticalBits.setMinWidth(350);
         hBox.getChildren().add(labelVerticalBits);
 
-        Label labelHorizontalBits = new Label();
+        Label labelH = new Label();
+        labelH.setText("最终编码H：");
+        labelH.setPadding(new Insets(0, 0, 0, 10));
+        hBox.getChildren().add(labelH);
+
+        TextField labelHorizontalBits = new TextField();
         labelHorizontalBits.setBackground(Background.fill(Color.RED));
         labelHorizontalBits.setText(regularHorizontalBits);
+        labelHorizontalBits.setEditable(false);
+        labelHorizontalBits.setMinWidth(350);
         hBox.getChildren().add(labelHorizontalBits);
 
         String finalBits = regularVerticalBits + regularHorizontalBits;
 
         BigInteger resultNumber = finalBits.isBlank() ? BigInteger.ZERO : new BigInteger(finalBits, 2);
         Label label1 = new Label();
-        label1.setText("最终表示的整数为： " + resultNumber);
-        label1.setBackground(Background.fill(Color.YELLOWGREEN));
-        label1.setMinWidth(400);
+        label1.setText("对应整数：");
+        label1.setPadding(new Insets(0, 0, 0, 10));
         hBox.getChildren().add(label1);
 
-        TextField label2 = new TextField();
-        label2.setText("对应的十六进制编码为 0x" + bin2hex(finalBits));
-        label2.setBackground(Background.fill(Color.BISQUE));
-        label2.setEditable(false);
-        label2.setPrefWidth(450);
+        TextField resultNumberCom = new TextField();
+        resultNumberCom.setBackground(Background.fill(Color.YELLOWGREEN));
+        resultNumberCom.setText(resultNumber.toString());
+        resultNumberCom.setEditable(false);
+        resultNumberCom.setMinWidth(350);
+        hBox.getChildren().add(resultNumberCom);
+
+        Label label2 = new Label();
+        label2.setText("对应十六进制：");
+        label2.setPadding(new Insets(0, 0, 0, 10));
         hBox.getChildren().add(label2);
+
+        TextField hexNumberCom = new TextField();
+        hexNumberCom.setBackground(Background.fill(Color.DODGERBLUE));
+        hexNumberCom.setText(bin2hex(finalBits));
+        hexNumberCom.setEditable(false);
+        hexNumberCom.setMinWidth(320);
+        hBox.getChildren().add(hexNumberCom);
 
         hBox.setLayoutX(10);
         hBox.setLayoutY(10);
 
         this.structPane.getChildren().add(hBox);
+
+        // 4. 开始画对应的短线
+        int regularBitLength = regularVerticalBits.length();
+        if (null != model.getHorizontalBits()  && !model.getHorizontalBits().isBlank()) {
+            // 画横线，找出对应的横线段二进制输入文本
+            String[] horizontalBitArray = model.getHorizontalBits().split("");
+            for (int i = 0; i < horizontalBitArray.length; i++) {
+                if (i == regularBitLength) break;
+                // 通过位运算来画线段， (10001010 >> (regularBitLength - i - 1)) & 00000001
+                BigInteger bitVal = resultNumber.shiftRight(regularBitLength - i - 1).and(BigInteger.ONE);
+                if (bitVal.equals(BigInteger.ONE)) {
+                    this.structPane.getChildren().add(horizontalShortLineList.get(i));
+                }
+            }
+        }
+        if (null != model.getVerticalBits() && !model.getVerticalBits().isBlank()) {
+            // 画竖线，获取对应竖线段二进制输入文本
+            String[] verticalBitArray = model.getVerticalBits().split("");
+            for (int i = 0; i < verticalBitArray.length; i++) {
+                if (i == regularBitLength) break;
+                BigInteger bitVal = resultNumber.shiftRight(regularBitLength + (regularBitLength - i - 1)).and(BigInteger.ONE);
+                if (bitVal.equals(BigInteger.ONE)) {
+                    this.structPane.getChildren().add(verticalShortLineList.get(i));
+                }
+            }
+        }
     }
 
     private String bin2hex(String input) {

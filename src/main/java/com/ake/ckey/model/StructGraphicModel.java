@@ -26,7 +26,7 @@ public class StructGraphicModel {
     private Color lineSegmentColor = Color.ALICEBLUE;
 
     /** 线段背景色 */
-    private Color lineBackground = Color.WHITESMOKE;
+    private Color lineBackground = Color.rgb(255, 255, 255, 0.2);
 
     /** 结构图背景色 */
     private Color backgroundColor = Color.BLACK;
@@ -35,10 +35,10 @@ public class StructGraphicModel {
     private boolean hasBorder = true;
 
     /** 边框宽度 */
-    private double borderWidth = 3;
+    private double borderWidth = 5;
 
     /** 边框颜色 */
-    private Color borderColor = Color.GREENYELLOW;
+    private Color borderColor = Color.rgb(13,125,147, 1.0);
 
     public Color getLineBackground() {
         return lineBackground;
