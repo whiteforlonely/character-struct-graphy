@@ -11,7 +11,7 @@ public class StructGraphicModel {
     private int rows = 5;
 
     /** 竖线段的显示标志 */
-    private String verticalBits;
+    private String verticalBits="0000011111";
 
     /** 横的显示标志 */
     private String horizontalBits;
@@ -26,7 +26,7 @@ public class StructGraphicModel {
     private Color lineSegmentColor = Color.ALICEBLUE;
 
     /** 线段背景色 */
-    private Color lineBackground = Color.rgb(255, 255, 255, 0.2);
+    private Color lineBackground = Color.rgb(255, 255, 255, 0.125);
 
     /** 结构图背景色 */
     private Color backgroundColor = Color.BLACK;

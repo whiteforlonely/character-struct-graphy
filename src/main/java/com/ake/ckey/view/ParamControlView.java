@@ -1,11 +1,9 @@
 package com.ake.ckey.view;
 
 import com.ake.ckey.model.StructGraphicModel;
-import javafx.scene.control.Control;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,25 +26,26 @@ public class ParamControlView {
      * 参数10： 边框宽度
      * 参数11： 边框颜色
      */
-    public List<ParamView> paramViews;
-    private StructGraphicModel dataModel;
+    public List<ParamView<TextField>> paramViews;
+    private final StructGraphicModel dataModel;
     private ParamChangeListener listener;
 
-    private final String colorRegex = "([0-9]{1,3}\\s){2}[0-9]{1,3}(\\s(0|1)?\\.?[0-9]+)?";
+    private final String colorRegex = "([0-9]{1,3}\\s){2}[0-9]{1,3}(\\s[01]?\\.?[0-9]+)?";
+    private final String doubleRegex = "[0-9]+([.][0-9]*)?";
 
     public ParamControlView(){
         paramViews = new ArrayList<>();
-        paramViews.add(initParam(TextField.class, "宫格数") );
-        paramViews.add(initParam(TextField.class, "竖线段(1101)") );
-        paramViews.add(initParam(TextField.class, "横线段(1101)") );
-        paramViews.add(initParam(TextField.class, "小方块宽度"));
-        paramViews.add(initParam(TextField.class, "线段宽度"));
-        paramViews.add(initParam(TextField.class, "线段颜色"));
-        paramViews.add(initParam(TextField.class, "线段背景色"));
-        paramViews.add(initParam(TextField.class, "全局背景色"));
-        paramViews.add(initParam(TextField.class, "是否有边框"));
-        paramViews.add(initParam(TextField.class, "边框宽度"));
-        paramViews.add(initParam(TextField.class, "边框颜色"));
+        paramViews.add(initParam("宫格数") );
+        paramViews.add(initParam("竖线段(1101)") );
+        paramViews.add(initParam("横线段(1101)") );
+        paramViews.add(initParam("小方块宽度"));
+        paramViews.add(initParam("线段宽度"));
+        paramViews.add(initParam("线段颜色"));
+        paramViews.add(initParam("线段背景色"));
+        paramViews.add(initParam("全局背景色"));
+        paramViews.add(initParam("是否有边框"));
+        paramViews.add(initParam("边框宽度"));
+        paramViews.add(initParam("边框颜色"));
 
         dataModel = new StructGraphicModel();
         initParamValue();
@@ -112,7 +111,7 @@ public class ParamControlView {
         paramViews.get(3).setListener( text -> {
             System.out.println("cell width changed: " + text);
             text = text.trim();
-            if (text.isBlank() || !text.isBlank() && !text.matches("[0-9]+[.]?[0-9]*")) {
+            if (text.isBlank() || !text.isBlank() && !text.matches(doubleRegex)) {
                 return;
             }
             double width = Double.parseDouble(text);
@@ -130,7 +129,7 @@ public class ParamControlView {
         paramViews.get(4).setListener( text -> {
             System.out.println("line segment width changed: " + text);
             text = text.trim();
-            if (text.isBlank() || !text.isBlank() && !text.matches("[0-9]+[.]?[0-9]*")) {
+            if (text.isBlank() || !text.isBlank() && !text.matches(doubleRegex)) {
                 return;
             }
             double lineSegmentWidth = Double.parseDouble(text);
@@ -201,7 +200,7 @@ public class ParamControlView {
         paramViews.get(9).setListener( text -> {
             System.out.println("border width changed: " + text);
             text = text.trim();
-            if (text.isBlank() || !text.isBlank() && !text.matches("[0-9]+[.]?[0-9]*")) {
+            if (text.isBlank() || !text.isBlank() && !text.matches(doubleRegex)) {
                 return;
             }
             double borderWidth = Double.parseDouble(text);
@@ -230,134 +229,45 @@ public class ParamControlView {
         });
     }
 
-    private  <T extends Control> ParamView<T> initParam(Class<T> c, String labelName){
-        try {
-            T t = c.getDeclaredConstructor().newInstance();
-            return new ParamView<>(labelName, t);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    // 获取宫格大小
-    public int getRows(){
-        ParamView paramView = this.paramViews.get(0);
-        Control input = paramView.getInput();
-        if (input instanceof TextField) {
-            TextField field = (TextField)input;
-            return Integer.parseInt(field.getText());
-        }
-        return 0;
+    private ParamView<TextField> initParam(String labelName){
+        TextField t = new TextField(labelName);
+        return new ParamView<>(labelName, t);
     }
 
     public void setRows(int rows){
-        ParamView paramView = this.paramViews.get(0);
-        Control input = paramView.getInput();
-        if (input instanceof TextField) {
-            TextField field = (TextField)input;
-            field.setText(String.valueOf(rows));
-        }
-    }
-
-    // 获取竖线段标识
-    public String getVerticalBits(){
-        ParamView paramView = this.paramViews.get(1);
-        Control input = paramView.getInput();
-        if (input instanceof TextField) {
-            TextField field = (TextField)input;
-            return field.getText();
-        }
-        return "";
+        ParamView<TextField> paramView = this.paramViews.get(0);
+        TextField field = paramView.getInput();
+        field.setText(String.valueOf(rows));
     }
 
     public void setVerticalBits(String vBits){
-        ParamView paramView = this.paramViews.get(1);
-        Control input = paramView.getInput();
-        if (input instanceof TextField) {
-            TextField field = (TextField)input;
-            field.setText(vBits);
-        }
-    }
-
-    // 获取横线短标识
-    public String getHorizonBits(){
-        ParamView paramView = this.paramViews.get(2);
-        Control input = paramView.getInput();
-        if (input instanceof TextField) {
-            TextField field = (TextField)input;
-            return field.getText();
-        }
-        return "";
+        ParamView<TextField> paramView = this.paramViews.get(1);
+        TextField field = paramView.getInput();
+        field.setText(vBits);
     }
 
     public void setHorizonBits(String hBits) {
-        ParamView paramView = this.paramViews.get(2);
-        Control input = paramView.getInput();
-        if (input instanceof TextField) {
-            TextField field = (TextField)input;
-            field.setText(hBits);
-        }
-    }
-
-    // 小方块宽度
-    public double getCellWidth(){
-        ParamView paramView = this.paramViews.get(3);
-        Control input = paramView.getInput();
-        if (input instanceof TextField) {
-            TextField field = (TextField)input;
-            return Double.parseDouble(field.getText());
-        }
-        return 0;
+        ParamView<TextField> paramView = this.paramViews.get(2);
+        TextField field = paramView.getInput();
+        field.setText(hBits);
     }
 
     public void setCellWidth(double cellWidth){
-        ParamView paramView = this.paramViews.get(3);
-        Control input = paramView.getInput();
-        if (input instanceof TextField) {
-            TextField field = (TextField)input;
-            field.setText(String.valueOf(cellWidth));
-        }
-    }
-
-    // 线段宽度
-    public double getLineSegmentWidth(){
-        ParamView paramView = this.paramViews.get(4);
-        Control input = paramView.getInput();
-        if (input instanceof TextField) {
-            TextField field = (TextField)input;
-            return Double.parseDouble(field.getText());
-        }
-        return 0;
+        ParamView<TextField> paramView = this.paramViews.get(3);
+        TextField field = paramView.getInput();
+        field.setText(String.valueOf(cellWidth));
     }
 
     public void setLineSegmentWidth(double lineSegmentWidth){
-        ParamView paramView = this.paramViews.get(4);
-        Control input = paramView.getInput();
-        if (input instanceof TextField) {
-            TextField field = (TextField)input;
-            field.setText(String.valueOf(lineSegmentWidth));
-        }
-    }
-
-    // 线段颜色
-    public Color getLineSegmentColor(){
-        ParamView paramView = this.paramViews.get(5);
-        Control input = paramView.getInput();
-        if (input instanceof TextField) {
-            TextField field = (TextField)input;
-            return parseFromText(field.getText());
-        }
-        return null;
+        ParamView<TextField> paramView = this.paramViews.get(4);
+        TextField field = paramView.getInput();
+        field.setText(String.valueOf(lineSegmentWidth));
     }
 
     public void setLineSegmentColor(Color lineSegmentColor){
-        ParamView paramView = this.paramViews.get(5);
-        Control input = paramView.getInput();
-        if (input instanceof TextField) {
-            TextField field = (TextField)input;
-            field.setText(getTextFromColor(lineSegmentColor));
-        }
+        ParamView<TextField> paramView = this.paramViews.get(5);
+        TextField field = paramView.getInput();
+        field.setText(getTextFromColor(lineSegmentColor));
     }
 
     private Color parseFromText(String text){
@@ -382,107 +292,37 @@ public class ParamControlView {
         return (int)(color.getRed()*255) + " " + (int)(color.getGreen()*255) + " " + (int)(color.getBlue()*255) + " " + color.getOpacity();
     }
 
-    // 线段背景色
-    public Color getLineBackground(){
-        ParamView paramView = this.paramViews.get(6);
-        Control input = paramView.getInput();
-        if (input instanceof TextField) {
-            TextField field = (TextField)input;
-            return parseFromText(field.getText());
-        }
-        return null;
-    }
-
     public void setLineBackground(Color lineBackground){
-        ParamView paramView = this.paramViews.get(6);
-        Control input = paramView.getInput();
-        if (input instanceof TextField) {
-            TextField field = (TextField)input;
-            field.setText(getTextFromColor(lineBackground));
-        }
-    }
-
-    // 全局背景色
-    public Color getBackground(){
-        ParamView paramView = this.paramViews.get(7);
-        Control input = paramView.getInput();
-        if (input instanceof TextField) {
-            TextField field = (TextField)input;
-            return parseFromText(field.getText());
-        }
-        return null;
+        ParamView<TextField> paramView = this.paramViews.get(6);
+        TextField field = paramView.getInput();
+        field.setText(getTextFromColor(lineBackground));
     }
 
     public void setBackground(Color background){
-        ParamView paramView = this.paramViews.get(7);
-        Control input = paramView.getInput();
-        if (input instanceof TextField) {
-            TextField field = (TextField)input;
-            field.setText(getTextFromColor(background));
-        }
-    }
-
-    // 是否有边框
-    public boolean hasBorder(){
-        ParamView paramView = this.paramViews.get(8);
-        Control input = paramView.getInput();
-        if (input instanceof TextField) {
-            TextField field = (TextField)input;
-            return Boolean.parseBoolean(field.getText());
-        }
-        return false;
+        ParamView<TextField> paramView = this.paramViews.get(7);
+        TextField field = paramView.getInput();
+        field.setText(getTextFromColor(background));
     }
 
     public void enableBorder(boolean hasBorder){
-        ParamView paramView = this.paramViews.get(8);
-        Control input = paramView.getInput();
-        if (input instanceof TextField) {
-            TextField field = (TextField)input;
-            field.setText(String.valueOf(hasBorder));
-        }
-    }
-
-    // 边框宽度
-    public double getBorderWidth(){
-        ParamView paramView = this.paramViews.get(9);
-        Control input = paramView.getInput();
-        if (input instanceof TextField) {
-            TextField field = (TextField)input;
-            return Double.parseDouble(field.getText());
-        }
-        return 0;
+        ParamView<TextField> paramView = this.paramViews.get(8);
+        TextField field = paramView.getInput();
+        field.setText(String.valueOf(hasBorder));
     }
 
     public void setBorderWidth(double borderWidth){
-        ParamView paramView = this.paramViews.get(9);
-        Control input = paramView.getInput();
-        if (input instanceof TextField) {
-            TextField field = (TextField)input;
-            field.setText(String.valueOf(borderWidth));
-        }
-    }
-
-    // 边框颜色
-    public Color getBorderColor(){
-        ParamView paramView = this.paramViews.get(10);
-        Control input = paramView.getInput();
-        if (input instanceof TextField) {
-            TextField field = (TextField)input;
-            return parseFromText(field.getText());
-        }
-        return null;
+        ParamView<TextField> paramView = this.paramViews.get(9);
+        TextField field = paramView.getInput();
+        field.setText(String.valueOf(borderWidth));
     }
 
     public void setBorderColor(Color borderColor){
-        ParamView paramView = this.paramViews.get(10);
-        Control input = paramView.getInput();
-        if (input instanceof TextField) {
-            TextField field = (TextField)input;
-            field.setText(getTextFromColor(borderColor));
-        }
+        ParamView<TextField> paramView = this.paramViews.get(10);
+        TextField input = paramView.getInput();
+        input.setText(getTextFromColor(borderColor));
     }
 
-    public List<ParamView> getParamViews() {
+    public List<ParamView<TextField>> getParamViews() {
         return paramViews;
     }
 
